@@ -16,7 +16,15 @@
 
 ## install 
 
+###必要な外部ライブラリ
 sudo pip install rpi.gpio
+
+###サーバー起動
+python ./bin/go.py
+
+###webアクセス
+ブラウザでweb/index.phpを開く
+
 
 
 
