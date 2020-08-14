@@ -1,138 +1,227 @@
 <!DOCTYPE html>
 <html lang="ja">
-  <head>
+
+<head>
     <meta name="viewport" content="width=device-width,
-				   initial-scale=0.64,user-scalable=no" />
+            initial-scale=0.64,user-scalable=no" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.3/rangeslider.min.css" integrity="sha512-Rp0yZ3NMh1xOUZ4VHYggmX4pq4ZJdpcOETH03qBD5qNDsqTBw1MzUnX0T5PcTJmr2mNTOmtbxsHaGwzjylNpHA==" crossorigin="anonymous" />
-    
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.3/rangeslider.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/svg.js/3.0.16/svg.min.js"></script>
     <style type="text/css">
-      html{
-      }
-      a{
-      padding:1em;
-      margin:1em;
-      border:solid thin #000;
-      font-size:28px;
-      }
-      input{
-      vertical-align:top;
-      }
+        a {
+            padding: 1em;
+            margin: 1em;
+            border: solid thin #000;
+            font-size: 28px;
+        }
+        
+        input {
+            vertical-align: top;
+        }
+        
+        .bg-line {
+            stroke-width: 1;
+            stroke: #aae;
+            stroke-dasharray: 5, 5;
+        }
+        
+        #vec {
+            stroke: #f8f;
+            stroke-width: 6;
+        }
+        
+        .Lvec,
+        .Rvec {
+            stroke: rgba(187, 255, 0, 0.438);
+            stroke-width: 40;
+        }
+        
+        .bg {
+            fill: rgba(188, 220, 246, 0.36);
+        }
+        
+        .R_text,
+        .L_text {
+            font-size: 32px;
+        }
     </style>
-
     <script>
-      var drag = {
-      isMouseDown : false,
-      target : null,
-      offsetx : 0,
-      offsety : 0,
-      }
-      document.onmouseup = function () {
-      drag.isMouseDown = false;
-      drag.target.cx.baseVal.value = 200;
-      drag.target.cy.baseVal.value = 350;
-      var el = $('#svg #vec').each(function(){
-      this.instance.plot(200,350,200,350);
+        var drag = {
+            isMouseDown: false,
+            target: null,
+            offsetx: 0,
+            offsety: 0,
+        }
+
+        function setPos(x, y) {
+            drag.target.cx.baseVal.value = x;
+            drag.target.cy.baseVal.value = y;
+        }
+
+        function setLineStretch() {
+            var el = $('#svg #vec').each(function() {
+                this.instance.plot(200, 350, drag.target.cx.baseVal.value, drag.target.cy.baseVal.value);
             })
-      }
-      document.onmousemove = function( e ) {
-      if (drag.isMouseDown == true) {
-      drag.target.cx.baseVal.value = e.clientX - drag.offsetx + 50;
-      drag.target.cy.baseVal.value = e.clientY - drag.offsety + 35;
-      var r = -1*(drag.target.cy.baseVal.value-300);
-      var l = (drag.target.cx.baseVal.value-200)/50;
-      if( l > 1 ){r/=l;l=r*l;}
-      else if( l < -1 ){l=-1*(r/l);}
-      else { l = r;}
-      $('#R').val(r);
-      $('#L').val(l);
-      var el = $('#svg #vec').each(function(){
-      this.instance.plot(200,350,drag.target.cx.baseVal.value,drag.target.cy.baseVal.value);
-      })
-      }
-      }
-      document.ontouchend = function( e ){
-      drag.isMouseDown = false;
-      drag.target.cx.baseVal.value = 200;
-      drag.target.cy.baseVal.value = 350;
-      var el = $('#svg #vec').each(function(){
-      this.instance.plot(200,350,200,350);
-      })
-      }
-      document.ontouchmove  = function( e ) {
+            setVecStretch();
+        }
 
-      if (event.targetTouches.length == 1){
-      var touch = event.targetTouches[0];
-      drag.target.cx.baseVal.value = touch.pageX ;
-      drag.target.cy.baseVal.value = touch.pageY ;
-      $('#R').val(drag.target.cy.baseVal.value);
-      var el = $('#svg #vec').each(function(){
-      this.instance.plot(200,350,drag.target.cx.baseVal.value,drag.target.cy.baseVal.value);
+        function setVecStretch() {
+            var el = $('.Lvec').each(function() {
+                var L = getL_value();
+                this.instance.plot(100, 300,
+                    100,
+                    300 - L);
+            })
+            var el = $('.Rvec').each(function() {
+                var R = getR_value();
+                this.instance.plot(300, 300,
+                    300,
+                    300 - R);
+            })
+        }
 
-      })
-}
-      }
-      function draggable( element ) {
-      element.addEventListener('touchmove', function( e ) {
-      e.preventDefault();
-      var rect = element.getBoundingClientRect();
-      drag.offsetx = e.clientX - rect.left;
-      drag.offsety = e.clientY - rect.top;;
-      drag.isMouseDown = true;
-            return false;
-      });
-      element.addEventListener('mousedown', function( e ) {
-      e.preventDefault();
-      var rect = element.getBoundingClientRect();
-      drag.offsetx = e.clientX - rect.left;
-      drag.offsety = e.clientY - rect.top;;
-      drag.isMouseDown = true;
-      return false;
-      });
-      }
-      
-      </script>
-  </head>
-  <body>
-    <svg id="svg" width="400" height="650">
-    </svg>
-    <input type="text" id="R">
-    <input type="text" id="L">
-    <!--
-    <a href="index.php?dir=go">Go</a><br/><br/>
-    <a href="index.php?dir=back">Back</a><br/><br/>
-    <a href="index.php?dir=stop">STOP</a><br/><br/>
-    <a href="index.php?dir=left">Left</a><br/><br/>
-    <a href="index.php?dir=right">Right</a><br/><br/>
--->
-  </body>
-  <script>
-    function set(l,r){
-    $.ajax('index.php',
-    {
-    type:'get',
-    data:{"dir":"go","R":l,"L":r}
-    });
+        function setText() {
+            var vR = getR_value();
+            var vL = getL_value();
+            vR = Math.ceil(vR);
+            var el = $('.R_text').each(function() {
+                this.instance.text(vR.toString());
+            })
+            vL = Math.ceil(vL);
+            var el = $('.L_text').each(function() {
+                this.instance.text(vL.toString());
+            })
+        }
+        document.onmouseup = function() {
+            drag.isMouseDown = false;
+            setPos(200, 350);
+            setText();
+            setLineStretch();
 
+        }
+
+        function getR_value() {
+            var r = -1 * (drag.target.cy.baseVal.value - 350);
+            var l = (drag.target.cx.baseVal.value - 200) / 50;
+            if (l > 1) {
+                r /= l;
+                l = r * l;
+            } else if (l < -1) {
+                l = -1 * (r / l);
+            } else {
+                l = r;
+            }
+            return r;
+        }
+
+        function getL_value() {
+            var r = -1 * (drag.target.cy.baseVal.value - 350);
+            var l = (drag.target.cx.baseVal.value - 200) / 50;
+            if (l > 1) {
+                r /= l;
+                l = r * l;
+            } else if (l < -1) {
+                l = -1 * (r / l);
+            } else {
+                l = r;
+            }
+            return l;
+        }
+        document.onmousemove = function(e) {
+            if (drag.isMouseDown == true) {
+                setPos(
+                    e.clientX - drag.offsetx + 50,
+                    e.clientY - drag.offsety + 35
+                );
+                setLineStretch();
+                setText();
+            }
+        }
+        document.ontouchend = function(e) {
+            drag.isMouseDown = false;
+            setPos(200, 350);
+            setLineStretch();
+        }
+        document.ontouchmove = function(e) {
+
+            if (event.targetTouches.length == 1) {
+                var touch = event.targetTouches[0];
+                setPos(touch.pageX, touch.pageY);
+                setLineStretch();
+
+                setText();
+            }
+        }
+
+        function draggable(element) {
+            element.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                var rect = element.getBoundingClientRect();
+                drag.offsetx = e.clientX - rect.left;
+                drag.offsety = e.clientY - rect.top;;
+                drag.isMouseDown = true;
+                return false;
+            });
+            element.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                var rect = element.getBoundingClientRect();
+                drag.offsetx = e.clientX - rect.left;
+                drag.offsety = e.clientY - rect.top;;
+                drag.isMouseDown = true;
+                return false;
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <svg id="svg" width="400" height="650"></svg>
+</body>
+<script>
+    function sendAPI(l, r) {
+        $.ajax('index.php', {
+            type: 'get',
+            data: {
+                "dir": "go",
+                "R": l,
+                "L": r
+            }
+        });
     }
-    $(function(){
+    $(function() {
         var draw = SVG('#svg');
-        var bg = draw.rect(1000, 800).fill('rgba(188, 220, 246, 0.36)')
-  
-        for (let i =0;i<50;i++){
-	  draw.line(40*i,0,40*i,800).stroke({ width: 1,color: '#aae' ,dasharray:'5,5' });
-	}
-	for (let i =0;i<20;i++){
-	  draw.line(0,40*i,1000,40*i).stroke({ width: 1,color: '#aae',dasharray:'5,5' });
-	}
-    	  draw.line({id:"vec",x1:150,y1:300,x2:150,y2:300}).stroke({ width: 6,color: '#f8f',id:"vec" });
-			  var rect = draw.circle(100).attr({id:"rect1"});
-			  rect.fill('blue').move(150,300);
-			  var rect1 = document.getElementById('rect1');
+        var bg = draw.rect(1000, 800).addClass('bg');
+
+
+
+        for (let i = 0; i < 50; i++) {
+            draw.line(40 * i, 0, 40 * i, 800).addClass('bg-line');
+        }
+        for (let i = 0; i < 20; i++) {
+            draw.line(0, 40 * i, 1000, 40 * i).addClass('bg-line');
+        }
+        draw.line({
+            id: "vec",
+            x1: 150,
+            y1: 300,
+            x2: 150,
+            y2: 300
+        }).addClass('vec');
+
+        var rect = draw.circle(100).attr({
+            id: "rect1"
+        }).fill('blue').move(150, 300);
+        var rect1 = document.getElementById('rect1');
         draggable(rect1);
         drag.target = rect1;
+        draw.line(100, 300, 100, 200).addClass('Lvec');
+        draw.line(300, 300, 300, 200).addClass('Rvec');
+        var rtext = draw.text("R").addClass('R_text').move(80, 300);
+        var ltext = draw.text("L").addClass('L_text').move(280, 300);
+
     });
-    </script>
+</script>
+
 </html>
