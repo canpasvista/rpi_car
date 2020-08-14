@@ -12,6 +12,7 @@ async fn task_that_takes_a_second() {
 
 #[tokio::main]
 async fn main() {
+
     let mut interval = time::interval(time::Duration::from_millis(100));
     for _i in 0..5 {
         interval.tick().await;
