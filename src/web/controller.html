@@ -194,14 +194,13 @@
         var draw = SVG('#svg');
         var bg = draw.rect(1000, 800).addClass('bg');
 
-
-
         for (let i = 0; i < 50; i++) {
             draw.line(40 * i, 0, 40 * i, 800).addClass('bg-line');
         }
         for (let i = 0; i < 20; i++) {
             draw.line(0, 40 * i, 1000, 40 * i).addClass('bg-line');
         }
+
         draw.line({
             id: "vec",
             x1: 150,
